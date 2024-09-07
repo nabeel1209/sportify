@@ -1,0 +1,22 @@
+*{
+    padding: 0;
+    margin: 0;
+    border: 1px red solid;
+    font-family: "Inter";
+}
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.nav-top{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.search-bar{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
