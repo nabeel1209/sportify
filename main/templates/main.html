@@ -8,33 +8,58 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/Sportify.png' %}">
     <title>{{ app_name }}</title>
 </head>
 <body>
     <section class="nav-top">
         <div class="search-bar">
-            <img src="" alt="">
-            <span>Search</span>
+            <img src="{% static 'icons/search-line.png' %}" alt="" height="15px" width="auto">
+            <p>Search</p>
         </div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+        <div class="icon-box">
+            <div class="icon-top">
+                <img src="{% static 'icons/mail.png' %}" alt="" height="100%" width="auto">
+            </div>
+            <div class="icon-top">
+                <img src="{% static 'icons/notif.png' %}" alt="" height="100%" width="auto">
+            </div>
+            <div class="icon-top">
+                <img src="{% static 'icons/cart.png' %}" alt="" height="100%" width="auto">
+            </div>
+            <div class="icon-top">
+                <img src="{% static 'icons/menu.png' %}" alt="" height="auto" width="100%">
+            </div>
+        </div>
     </section>
-    <!-- <menu class="menu">
-        <div class="name-logo">
-            <img src="" alt="" height="100px" width="100px">
-            <h1>{{ app_name }}</h1>
+    <main>
+        <section class="hero">
+            <img src="{% static 'images/Sportify.png' %}" alt="" width="auto" height="70%">
+            <div>
+                <h1>{{ app_name }}</h1>
+                <h2>{{ name }}</h2>
+                <h3>{{ class }}</h3>
+            </div>
+            
+        </section>
+    </main>
+    <section class="nav-bottom">
+        <div class="icon-bottom">
+            <img src="{% static 'icons/home.png' %}" alt="" height="30" width="30">
+            <p>Home</p>
         </div>
-        <nav class="navigation">
-            <div>Home</div>
-            <div>Products</div>
-            <div>Login</div>
-            <div>Register</div>
-        </nav>
-    </menu> -->
-    <!-- <h1>{{ app_name }}</h1>
-    <p>{{ name }}</p>
-    <p>{{ class }}</p> -->
+        <div class="icon-bottom">
+            <img src="{% static 'icons/feed.png' %}" alt="" height="60%" width="auto">
+            <p>Feed</p>
+        </div>
+        <div class="icon-bottom">
+            <img src="{% static 'icons/wishlist.png' %}" alt="" height="23" width="26">
+            <p>Wishlist</p>
+        </div>
+        <div class="icon-bottom">
+            <img src="{% static 'icons/transaksi.png' %}" alt="" height="23" width="23">
+            <p>Transaksi</p>
+        </div>
+    </section>
 </body>
 </html>
