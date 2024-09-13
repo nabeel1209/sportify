@@ -127,3 +127,6 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTOMATIC_RELOAD = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost","http://127.0.0.1","http://nabeel-muhammad-sportify.pbp.cs.ui.ac.id/", "https://nabeel-muhammad-sportify.pbp.cs.ui.ac.id/"]
+
+
