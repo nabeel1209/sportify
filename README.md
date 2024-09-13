@@ -1,6 +1,6 @@
 # Tugas 2: Implementasi *Model-View-Template* (MVT) pada Django
 ##### Nabeel Muhammad (2306275166)
-Web : http://nabeel-muhammad-sportifyfinal.pbp.cs.ui.ac.id/
+Web : http://nabeel-muhammad-sportify.pbp.cs.ui.ac.id/
 - Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
     - Membuat sebuah proyek Django baru.
         1. Membuat folder baru dengan nama `sportify`.
