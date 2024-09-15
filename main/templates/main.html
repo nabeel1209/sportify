@@ -1,65 +1,83 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="{% static 'images/Sportify.png' %}">
-    <title>{{ app_name }}</title>
-</head>
-<body>
-    <section class="nav-top">
-        <div class="search-bar">
-            <img src="{% static 'icons/search-line.png' %}" alt="" height="15px" width="auto">
-            <p>Search</p>
+{% block meta %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+<link rel="icon" type="image/x-icon" href="{% static 'images/Sportify.png' %}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+<title>{{ app_name }}</title>
+{% endblock meta %}
+
+{% block content %}
+<section class="nav-top">
+    <input type="text" placeholder="Search" class="search-bar">
+    </input>
+    <div class="icon-box">
+        <div class="icon-top">
+            <img src="{% static 'icons/mail.png' %}" alt="" height="100%" width="auto">
         </div>
-        <div class="icon-box">
-            <div class="icon-top">
-                <img src="{% static 'icons/mail.png' %}" alt="" height="100%" width="auto">
-            </div>
-            <div class="icon-top">
-                <img src="{% static 'icons/notif.png' %}" alt="" height="100%" width="auto">
-            </div>
-            <div class="icon-top">
-                <img src="{% static 'icons/cart.png' %}" alt="" height="100%" width="auto">
-            </div>
-            <div class="icon-top">
-                <img src="{% static 'icons/menu.png' %}" alt="" height="auto" width="100%">
+        <div class="icon-top">
+            <img src="{% static 'icons/notif.png' %}" alt="" height="100%" width="auto">
+        </div>
+        <div class="icon-top">
+            <img src="{% static 'icons/cart.png' %}" alt="" height="100%" width="auto">
+        </div>
+        <div class="icon-top">
+            <img src="{% static 'icons/menu.png' %}" alt="" height="auto" width="100%">
+        </div>
+    </div>
+</section>
+<main>
+    <section class="hero">
+        <img src="{% static 'images/Sportify.png' %}" alt="" width="auto" height="70%">
+        <div class="app-desc">
+            <h1>{{ app_name }}</h1>
+            <h2>{{ name }}</h2>
+            <h3>{{ class }}</h3>
+            <div class="button-box">
+                <a href="{% url 'main:create_product' %}">
+                    <button class="add-product-button">Add New Product</button>
+                </a>
             </div>
         </div>
     </section>
-    <main>
-        <section class="hero">
-            <img src="{% static 'images/Sportify.png' %}" alt="" width="auto" height="70%">
-            <div>
-                <h1>{{ app_name }}</h1>
-                <h2>{{ name }}</h2>
-                <h3>{{ class }}</h3>
+    <section class="catalog">
+        {% if not products %}
+        <p style="position:absolute; align-self: center; margin: auto; font-weight: 600; justify-self: center;">Belum ada data products pada Sportify.</p>
+        {% else %}
+            {% for product in products %}
+            <div class="product">
+                <div class="product-image-box">
+
+                </div>
+                <div class="product-details">
+                    <h1 class="product-name">{{ product.name }}</h1>
+                    <p class="product-desc">{{ product.description }}</p>
+                    <p class="product-price">Rp {{ product.price }}</p>
+                    <p class="product-stock">Stock : {{ product.stock }}</p>
+                </div>
             </div>
-            
-        </section>
-    </main>
-    <section class="nav-bottom">
-        <div class="icon-bottom">
-            <img src="{% static 'icons/home.png' %}" alt="" height="30" width="30">
-            <p>Home</p>
-        </div>
-        <div class="icon-bottom">
-            <img src="{% static 'icons/feed.png' %}" alt="" height="60%" width="auto">
-            <p>Feed</p>
-        </div>
-        <div class="icon-bottom">
-            <img src="{% static 'icons/wishlist.png' %}" alt="" height="23" width="26">
-            <p>Wishlist</p>
-        </div>
-        <div class="icon-bottom">
-            <img src="{% static 'icons/transaksi.png' %}" alt="" height="23" width="23">
-            <p>Transaksi</p>
-        </div>
+            {% endfor %}
+        {% endif %}
     </section>
-</body>
-</html>
+</main>
+<section class="nav-bottom">
+    <div class="icon-bottom">
+        <img src="{% static 'icons/home.png'%}" alt="" height="30" width="30">
+        <p>Home</p>
+    </div>
+    <div class="icon-bottom">
+        <img src="{% static 'icons/feed.png'%}" alt="" height="60%" width="auto">
+        <p>Feed</p>
+    </div>
+    <div class="icon-bottom">
+        <img src="{% static 'icons/wishlist.png'%}" alt="" height="23" width="26">
+        <p>Wishlist</p>
+    </div>
+    <div class="icon-bottom">
+        <img src="{% static 'icons/transaksi.png'%}" alt="" height="23" width="23">
+        <p>Transaksi</p>
+    </div>
+</section>
+{% endblock content %}
