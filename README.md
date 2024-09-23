@@ -592,7 +592,6 @@ ___
     - Membuat dua akun pengguna dengan masing-masing tiga dummy data menggunakan model yang telah dibuat pada aplikasi sebelumnya untuk setiap akun di lokal.
         - Mendaftarkan akun user dengan melakukan registrasi akun ke dalam sistem melalui halaman `localhost:8000\register`.
         - Mendaftarkan product untuk user yang sudah login dengan menekan tombol `Add New Product`
-    <br/>
     - Menghubungkan model Product dengan User.
         Dengan menambahkan atribut `User` sebagai `ForeignKey` pada object `Product`. Cara implementasinya adalah sebagai berikut:
         - Menambahkan kode di bawah ini pada `models.py`
@@ -603,7 +602,6 @@ ___
                 user = models.ForeignKey(User, on_delete=models.CASCADE)
                 .....
             ```
-        <br/>
     - Menampilkan detail informasi pengguna yang sedang *logged in* seperti *username* dan menerapkan *cookies* seperti *last login* pada halaman utama aplikasi.
         - Menambahkan atribut pada `context` pada fungsi  `show_main` pada `views.py` dengan menambahkan 
             ```python
