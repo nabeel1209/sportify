@@ -31,9 +31,13 @@
             <h1>{{ app_name }}</h1>
             <h2>{{ name }}</h2>
             <h3>{{ class }}</h3>
+            <h3>Selamat datang, {{ name }}</h3>
             <div class="button-box">
                 <a href="{% url 'main:create_product' %}">
                     <button class="add-product-button">Add New Product</button>
+                </a>
+                <a href="{% url 'main:logout' %}">
+                    <button class="logout-button">Logout</button>
                 </a>
             </div>
         </div>

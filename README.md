@@ -300,3 +300,323 @@ ___
     <img src="./Tugas3/XML.png"/>
     <img src="./Tugas3/JSONByID.png"/>
     <img src="./Tugas3/XMLByID.png"/>
+
+---
+# Tugas 4: Implementasi Autentikasi, Session, dan Cookies pada Django
+
+- Apa perbedaan antara `HttpResponseRedirect()` dan `redirect()`
+    - `redirect()` lebih mudah digunakan karena dapat menerima argumen lain seperti view name atau model object, sementara `HttpResponseRedirect` hanya menerima URL.
+    - `redirect()` lebih fleksibel dan mendukung nama view serta objek model untuk pengalihan, sedangkan `HttpResponseRedirect` hanya bekerja dengan URL eksplisit.
+    - `redirect()` lebih disukai dalam praktik terbaik karena lebih ringkas dan membuat kode lebih mudah dibaca.
+    <br/>
+
+- Jelaskan cara kerja penghubungan model `Product` dengan `User`!
+    Dengan menambahkan atribut `User` sebagai `ForeignKey` pada object `Product`. Cara implementasinya adalah sebagai berikut:
+    - Menambahkan kode di bawah ini pada `models.py`
+        ```python
+        from django.contrib.auth.models import User
+        ....
+        class Product(models.Model):
+            user = models.ForeignKey(User, on_delete=models.CASCADE)
+            .....
+        ```
+- Apa perbedaan antara *authentication* dan *authorization*, apakah yang dilakukan saat pengguna login? Jelaskan bagaimana Django mengimplementasikan kedua konsep tersebut.
+    - *authentication* adalah cara untuk memastikan bahwa user merupakan bagian dari user yang teregistrasi oleh sistem. Cara implementasinya adalah sebagai berikut:
+        1. Membuat `register form` serta `login form` yang digunakan untuk authentication yang nantinya diimplementasikan dalam `templates` agar `user` dapat menginput data credential mereka agar sistem dapat memastikan `user` benar teregistrasi dalam sistem. Hal ini dapat diimplementasi pada kode dengan menambahkan kode di bawah ini pada `views.py`
+            ```python
+            def register(request):
+            form = UserCreationForm()
+            if request.method == "POST":
+                form = UserCreationForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    messages.success(request, 'Your account has been successfully created!')
+                    return redirect('main:login')
+            context = {'form':form}
+            return render(request, 'register.html', context)
+
+            def login_user(request):
+            if request.method == 'POST':
+                form = AuthenticationForm(data=request.POST)
+                if form.is_valid():
+                    user = form.get_user()
+                    login(request, user)
+                    response = HttpResponseRedirect(reverse("main:show_main"))
+                    response.set_cookie('last_login', str(datetime.datetime.now()))
+                    return response
+            else:
+            form = AuthenticationForm(request)
+            context = {'form': form}
+            return render(request, 'login.html', context)
+            ```
+        2. Nantinya kita juga akan membuat `register.html` pada folder `templates` yang ada pada folder `main`. Kedua file ini berisikan 
+            ```html
+            {% extends 'base.html' %}
+
+            {% block meta %}
+            <title>Register</title>
+            {% endblock meta %}
+
+            {% block content %}
+
+            <div class="login">
+            <h1>Register</h1>
+
+            <form method="POST">
+                {% csrf_token %}
+                <table>
+                {{ form.as_table }}
+                <tr>
+                    <td></td>
+                    <td><input type="submit" name="submit" value="Daftar" /></td>
+                </tr>
+                </table>
+            </form>
+
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            </div>
+
+            {% endblock content %}
+            ```
+        3. Kita juga akan membuat `login.html` pada folder `templates` yang ada pada folder `main`. Kedua file ini berisikan
+            ```html
+            {% extends 'base.html' %}
+
+            {% block meta %}
+            <title>Login</title>
+            {% endblock meta %}
+
+            {% block content %}
+            <div class="login">
+            <h1>Login</h1>
+
+            <form method="POST" action="">
+                {% csrf_token %}
+                <table>
+                {{ form.as_table }}
+                <tr>
+                    <td></td>
+                    <td><input class="btn login_btn" type="submit" value="Login" /></td>
+                </tr>
+                </table>
+            </form>
+
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %} Don't have an account yet?
+            <a href="{% url 'main:register' %}">Register Now</a>
+            </div>
+
+            {% endblock content %}
+            ```
+    - *authorization* adalah cara untuk memberikan role serta permisssions kepada user yang teregistrasi oleh sistem. Cara implementasinya adalah sebagai berikut:
+        Berikut adalah cara mengatur grup pada Django Admin sesuai dengan panduan otentikasi di [MDN Web Docs](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Authentication):
+
+        1. **Membuat Grup di Django Admin**:
+        Akses halaman admin Django, lalu pilih bagian "Groups" di bawah kategori "Authentication and Authorization". Di sini, Anda bisa membuat grup baru dan memberi nama yang sesuai, misalnya "Admin" atau "Editor".
+
+        2. **Menambahkan Izin ke Grup**:
+        Setelah grup dibuat, Anda dapat menambahkan izin yang spesifik ke grup tersebut. Django menyediakan izin seperti tambah, ubah, hapus, dan lihat pada setiap model. Dengan ini, Anda bisa mengontrol apa yang bisa dilakukan oleh pengguna dalam grup tersebut.
+
+        3. **Menambahkan Pengguna ke Grup**:
+        Masuk ke bagian "Users" pada admin Django, pilih pengguna yang ingin ditambahkan ke grup, dan di bagian "Groups", pilih grup yang diinginkan. Pengguna tersebut akan mewarisi semua izin yang telah ditetapkan untuk grup tersebut.
+
+        4. **Kustomisasi Tampilan Grup di Admin**:
+        Anda dapat menyesuaikan bagaimana grup dan izin ditampilkan di antarmuka admin dengan mengedit file `admin.py`. Misalnya, Anda bisa membuat tampilan yang lebih mudah untuk mengelola pengguna dan grup secara efisien.
+
+
+- Bagaimana Django mengingat pengguna yang telah login? Jelaskan kegunaan lain dari *cookies* dan apakah semua *cookies* aman digunakan?
+    Django mengingat pengguna yang telah login menggunakan mekanisme **session** yang memanfaatkan **cookies**. Saat seorang pengguna login, Django membuat sebuah *session* yang disimpan di database atau backend lain (misalnya file-based atau cache). Kemudian, Django mengirimkan *session ID* kepada pengguna dalam bentuk cookie. <br>
+    - Prosesnya secara singkat adalah sebagai berikut:
+        1. **Login**: Saat pengguna memasukkan kredensial yang benar, Django membuat sebuah *session* untuk pengguna tersebut dan menyimpannya di backend *session*.
+        2. **Cookie Session ID**: Django mengirimkan sebuah cookie berisi *session ID* ke browser pengguna.
+        3. **Session Tracking**: Setiap kali pengguna mengirim request baru, browser akan mengirimkan *session ID* melalui cookie. Django akan memverifikasi *session ID* tersebut dan memastikan bahwa pengguna masih terotentikasi.
+        4. **Logout**: Saat pengguna logout, Django akan menghapus *session* yang terkait dengan pengguna tersebut, sehingga cookie tersebut menjadi tidak berguna.<br>
+    - Selain mengingat pengguna yang telah login, cookies memiliki beberapa kegunaan lain, antara lain:
+        1. **Personalization**: Cookies dapat digunakan untuk menyimpan preferensi pengguna seperti tema tampilan atau bahasa yang dipilih.
+        2. **Tracking**: Cookies sering digunakan oleh perusahaan untuk melacak perilaku pengguna di berbagai halaman dan situs, sering kali digunakan untuk kepentingan iklan berbasis perilaku (behavioral advertising).
+        3. **Shopping Cart**: Dalam situs e-commerce, cookies dapat digunakan untuk menyimpan item yang dimasukkan ke dalam keranjang belanja meskipun pengguna belum login.
+
+    - Tidak semua cookies aman digunakan. Ada beberapa aspek keamanan yang perlu dipertimbangkan:
+        1. **Cookies Aman (Secure Cookies)**: Cookies ini hanya dikirim melalui koneksi HTTPS yang aman, sehingga mencegah penyadapan selama transmisi. Django memungkinkan pengaturan agar cookies hanya dikirim melalui HTTPS dengan pengaturan `SESSION_COOKIE_SECURE = True`.
+        2. **HTTPOnly Cookies**: Cookies yang memiliki atribut *HttpOnly* hanya dapat diakses oleh server dan tidak oleh JavaScript, sehingga mencegah serangan *Cross-Site Scripting (XSS)*. Pengaturan `SESSION_COOKIE_HTTPONLY = True` pada Django mengaktifkan fitur ini.
+        3. **SameSite Cookies**: Cookies dengan atribut *SameSite* mencegah pengiriman cookies lintas situs, yang dapat mengurangi risiko serangan *Cross-Site Request Forgery (CSRF)*.
+        4. **Cookies yang Berbahaya**: Cookies dapat disalahgunakan untuk melacak pengguna tanpa izin mereka, yang sering menjadi perhatian privasi. Selain itu, jika cookies tidak diatur dengan baik (misalnya tanpa enkripsi atau HTTPOnly), mereka rentan terhadap serangan pihak ketiga.
+
+- Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+    - Mengimplementasikan fungsi registrasi, login, dan logout untuk memungkinkan pengguna untuk mengakses aplikasi sebelumnya dengan lancar.
+        1. `registrasi` <span style="font-family:Inter;"> -> </span> dilakukan dengan menambahkan fungsi pada `views.py`, yaitu
+            ```python
+            from django.contrib.auth.forms import UserCreationForm
+            from django.contrib import messages
+
+            def register(request):
+                form = UserCreationForm()
+                if request.method == "POST":
+                    form = UserCreationForm(request.POST)
+                    if form.is_valid():
+                        form.save()
+                        messages.success(request, 'Your account has been successfully created!')
+                        return redirect('main:login')
+                context = {'form':form}
+                return render(request, 'register.html', context)
+            ```
+            lalu kita perlu menambahkan file `register.html` pada folder `templates` yang ada pada folder `main` yang berisi 
+            ```html
+            {% extends 'base.html' %}
+
+            {% block meta %}
+            <title>Register</title>
+            {% endblock meta %}
+
+            {% block content %}
+
+            <div class="login">
+            <h1>Register</h1>
+
+            <form method="POST">
+                {% csrf_token %}
+                <table>
+                {{ form.as_table }}
+                <tr>
+                    <td></td>
+                    <td><input type="submit" name="submit" value="Daftar" /></td>
+                </tr>
+                </table>
+            </form>
+
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            </div>
+
+            {% endblock content %}
+            ```
+            hal terakhir yang kita butuhkan adalah kita harus mendefinisikan url yang akan memanggil fungsi serta mengembalikan response berupa file html. Hal ini dapat dilakukan dengan menambahkan path berikut pada `urlpatterns` pada `urls.py`
+            ```python
+            urlpatterns=[
+                ..., 
+                path('register/', register, name='register'),
+            ]
+            ```
+        2. `login` <span style="font-family:Inter;"> -> </span> dilakukan dengan menambahkan fungsi pada `views.py`, yaitu
+            ```python
+            from django.contrib.auth.forms import ..., AuthenticationForm
+            from django.http import ..., HttpResponseRedirect
+
+            def login_user(request):
+                if request.method == 'POST':
+                    form = AuthenticationForm(data=request.POST)
+                    if form.is_valid():
+                        user = form.get_user()
+                        login(request, user)
+                        response = HttpResponseRedirect(reverse("main:show_main"))
+                        response.set_cookie('last_login', str(datetime.datetime.now()))
+                        return response
+                else:
+                form = AuthenticationForm(request)
+                context = {'form': form}
+                return render(request, 'login.html', context)
+            ```
+            lalu kita perlu menambahkan file `register.html` pada folder `templates` yang ada pada folder `main` yang berisi 
+            ```html
+            {% extends 'base.html' %}
+
+            {% block meta %}
+            <title>Login</title>
+            {% endblock meta %}
+
+            {% block content %}
+            <div class="login">
+            <h1>Login</h1>
+
+            <form method="POST" action="">
+                {% csrf_token %}
+                <table>
+                {{ form.as_table }}
+                <tr>
+                    <td></td>
+                    <td><input class="btn login_btn" type="submit" value="Login" /></td>
+                </tr>
+                </table>
+            </form>
+
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %} Don't have an account yet?
+            <a href="{% url 'main:register' %}">Register Now</a>
+            </div>
+
+            {% endblock content %}
+            ```
+            hal terakhir yang kita butuhkan adalah kita harus mendefinisikan url yang akan memanggil fungsi serta mengembalikan response berupa file html. Hal ini dapat dilakukan dengan menambahkan path berikut pada `urlpatterns` pada `urls.py`
+            ```python
+            urlpatterns=[
+                ..., 
+                path('login/', login_user, name='login'),
+            ]
+            ```
+        3. `logout` <span style="font-family:Inter;"> -> </span> dilakukan dengan menambahkan fungsi pada `views.py`, yaitu
+            ```python
+            def logout_user(request):
+                response = HttpResponseRedirect(reverse('main:login'))
+                response.delete_cookie('last_login')
+                logout(request)
+                return redirect('main:login')
+            ```
+            lalu kita perlu menambahkan *button* pada file `main.html` yang berguna untuk memanggil fungsi `logout` dengan menambahkan 
+            ```html
+            <a href="{% url 'main:logout' %}">
+                    <button class="logout-button">Logout</button>
+            </a>
+            ```
+    - Membuat dua akun pengguna dengan masing-masing tiga dummy data menggunakan model yang telah dibuat pada aplikasi sebelumnya untuk setiap akun di lokal.
+        - Mendaftarkan akun user dengan melakukan registrasi akun ke dalam sistem melalui halaman `localhost:8000\register`.
+        - Mendaftarkan product untuk user yang sudah login dengan menekan tombol `Add New Product`
+    <br/>
+    - Menghubungkan model Product dengan User.
+        Dengan menambahkan atribut `User` sebagai `ForeignKey` pada object `Product`. Cara implementasinya adalah sebagai berikut:
+        - Menambahkan kode di bawah ini pada `models.py`
+            ```python
+            from django.contrib.auth.models import User
+            ....
+            class Product(models.Model):
+                user = models.ForeignKey(User, on_delete=models.CASCADE)
+                .....
+            ```
+        <br/>
+    - Menampilkan detail informasi pengguna yang sedang *logged in* seperti *username* dan menerapkan *cookies* seperti *last login* pada halaman utama aplikasi.
+        - Menambahkan atribut pada `context` pada fungsi  `show_main` pada `views.py` dengan menambahkan 
+            ```python
+            def show_main(request):
+                products = Product.objects.filter(user=request.user)
+                context = {
+                    'name':request.user.username,
+                    ...,
+                }
+            ```
+        - Menambahkan beberapa kode pada `main.html` untuk menampilkan beberapa detail informasi dari user yang telah login
+            ```html
+            <h3>Selamat datang, {{ name }}</h3>
+            ```
+        - Implementasi *cookies*
+        <img src="./Tugas4/Cookies.png">
