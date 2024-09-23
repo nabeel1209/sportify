@@ -84,6 +84,7 @@ main{
     padding:6px;
     position: absolute;
     bottom:0;
+    background-color: #121212;
 }
 .icon-bottom{
     height: 90%;
@@ -117,10 +118,26 @@ main{
 }
 .button-box{
     display: flex;
+    gap:5px;
 
 }
 .add-product-button{
     background-color: #28e368;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-weight: 700;
+    border-color: transparent;
+    border-width: 0;
+    margin-top: 10px;
+    -webkit-text-fill-color: white;
+    cursor: pointer;
+}
+.logout-button{
+    background-color: red;
     font-size: 1.1rem;
     border-radius: 12px;
     padding-left: 12px;
@@ -147,6 +164,7 @@ main{
     padding-top: 10px;
     justify-content: space-evenly;
     align-items: start;
+    overflow-y: scroll;
 }
 
 .product{
