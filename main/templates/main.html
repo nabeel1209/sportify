@@ -1,83 +1,36 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block meta %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+{% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}"> {% endcomment %}
 <title>{{ app_name }}</title>
 {% endblock meta %}
 
 {% block content %}
-<section class="nav-top">
-    <input type="text" placeholder="Search" class="search-bar">
-    </input>
-    <div class="icon-box">
-        <div class="icon-top">
-            <img src="{% static 'icons/mail.png' %}" alt="" height="100%" width="auto">
+{% include "navbar.html" %}
+<main class="relative w-full overflow-y-scroll mt-20">
+    <section class="w-full h-52 pt-2 relative flex flex-col text-white justify-center items-center gap-2">
+        <h1 class="self-center text-center font-bold text-xl">Selamat datang, {{ name }}</br>dari kelas {{ class }}</h1>
+        <div class="flex gap-2 mt-6">
+            <a href="{% url 'main:create_product' %}">
+                <button class="bg-[#22c55ea6] text-lg rounded-xl px-3 py-1 font-semibold text-white cursor-pointer flex justify-center items-center">Add New Product</button>
+            </a>
+            <a href="{% url 'main:logout' %}">
+                <button class="bg-[#ef4444b0] text-lg rounded-xl px-3 py-1 font-semibold text-white cursor-pointer flex justify-center items-center">Logout</button>
+            </a>
         </div>
-        <div class="icon-top">
-            <img src="{% static 'icons/notif.png' %}" alt="" height="100%" width="auto">
-        </div>
-        <div class="icon-top">
-            <img src="{% static 'icons/cart.png' %}" alt="" height="100%" width="auto">
-        </div>
-        <div class="icon-top">
-            <img src="{% static 'icons/menu.png' %}" alt="" height="auto" width="100%">
-        </div>
+    </section>
+    
+    {% if not products %}
+    <div class="fixed flex flex-col justify-center items-center gap-2 left-1/2 bottom-1/3 -translate-x-1/2 translate-y-1/2">
+        <img src="{% static "/icons/no-product.png" %}" alt="" class="h-auto w-28 ">
+        <p class="font-bold text-white text-lg text-center">Belum ada data products pada Sportify.</p>
     </div>
-</section>
-<main>
-    <section class="hero">
-        <img src="{% static 'images/Sportify.png' %}" alt="" width="auto" height="70%">
-        <div class="app-desc">
-            <h1>{{ app_name }}</h1>
-            <h2>{{ name }}</h2>
-            <h3>{{ class }}</h3>
-            <h3>Selamat datang, {{ name }}</h3>
-            <div class="button-box">
-                <a href="{% url 'main:create_product' %}">
-                    <button class="add-product-button">Add New Product</button>
-                </a>
-                <a href="{% url 'main:logout' %}">
-                    <button class="logout-button">Logout</button>
-                </a>
-            </div>
-        </div>
+    {% else %}
+    <section class="relative w-full h-full text-white grid grid-cols-[repeat(auto-fill,345px)] grid-rows-[repeat(auto-fill,160px)] gap-4 pt-2 justify-evenly items-center overflow-y-scroll pl-4">
+        {% for product in products %}
+        {% include "card_product.html" with product=product %}
+        {% endfor %}
     </section>
-    <section class="catalog">
-        {% if not products %}
-        <p style="position:absolute; align-self: center; margin: auto; font-weight: 600; justify-self: center;">Belum ada data products pada Sportify.</p>
-        {% else %}
-            {% for product in products %}
-            <div class="product">
-                <div class="product-image-box">
-
-                </div>
-                <div class="product-details">
-                    <h1 class="product-name">{{ product.name }}</h1>
-                    <p class="product-desc">{{ product.description }}</p>
-                    <p class="product-price">Rp {{ product.price }}</p>
-                    <p class="product-stock">Stock : {{ product.stock }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        {% endif %}
-    </section>
+    {% endif %}
 </main>
-<section class="nav-bottom">
-    <div class="icon-bottom">
-        <img src="{% static 'icons/home.png'%}" alt="" height="30" width="30">
-        <p>Home</p>
-    </div>
-    <div class="icon-bottom">
-        <img src="{% static 'icons/feed.png'%}" alt="" height="60%" width="auto">
-        <p>Feed</p>
-    </div>
-    <div class="icon-bottom">
-        <img src="{% static 'icons/wishlist.png'%}" alt="" height="23" width="26">
-        <p>Wishlist</p>
-    </div>
-    <div class="icon-bottom">
-        <img src="{% static 'icons/transaksi.png'%}" alt="" height="23" width="23">
-        <p>Transaksi</p>
-    </div>
-</section>
 {% endblock content %}

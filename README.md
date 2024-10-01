@@ -618,3 +618,84 @@ ___
             ```
         - Implementasi *cookies*
         <img src="./Tugas4/Cookies.png">
+---
+# Tugas 5: Desain Web menggunakan HTML, CSS dan Framework CSS
+
+- Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+    Urutan prioritas: 
+    1. ID Selector (menggunakan # pada awal ID elemen)
+    *Styling* yang dipakai dengan selector ini akan diprioritaskan paling pertama sehingga jika ada *styling* dengan menggunakan *class selector* maupun *element selector* akan ter-*overwrite* oleh *styling* dengan *ID selector*
+    2. Class Selector (menggunakan . pada awal nama Class)
+    *Styling* yang dipakai dengan selector ini akan diprioritaskan setelah *element selector* sehingga jika ada *styling* dengan menggunakan *element selector* akan ter-*overwrite* oleh *styling* dengan *class selector*. Namun, jika ada *styling* dengan *ID selector* maka tidak akan ter-*overwrite* oleh *styling* dengan *class selector*
+    3. Element Selector (langsung menggunakan nama elemen saja)
+    *Styling* yang dipakai dengan selector ini **tidak akan** diprioritaskan sehingga jika ada *styling* dengan menggunakan *class selector* atau *ID selector* maka styling dengan *element selector* ter-*overwrite* oleh *styling* dengan *class selector* atau *ID selector*.
+- Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design!
+Responsive design sangat berpengaruh karena tidak semua pengguna dapat mengakses sebuah web melalui browser pada desktop. Oleh karena itu, responsive design akan menambah kenyamanan kepada pengguna. Sehingga pengguna tidak hanya bisa mengakses web dengan mudah melalui desktop, tetapi juga melalui mobile browser.
+    - Contoh aplikasi web dengan responsive design : Scele
+    - Contoh aplikasi web tanpa responsive design : Pacil Web Service 
+- Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+    - Margin merupakan jarak yang didefinisikan sebagai jarak border sebuah elemen dengan elemen lain di luar tagnya (jarak dari luar objek)
+    - Border merupakan batasan yang berada pada sebuah elemen dengan elemen di luar tagnya.
+    - Padding merupakan jarak yang didefiniskan sebagai jarak border sebuah box atau container dengan item di dalamnya.
+- Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+    - Flex box menggunakan konsep container yang dapat diatur penggunaannya secara horizontal atau vertical. Misal, kita ingin membuat sebuah gambar yang ditampilkan berurutan ke kanan. Maka kita dapat dengan mudah menggunakan flex box untuk membuatnya.
+    - Grid layout menggunakan konsep container yang diatur dengan menggunakan koordinat sebagai tempat untuk sebuah elemen. Sebuah kombinasi (x,y) dapat diisi dengan sebuah elemen sehingga grid layout cocok digunakan untuk membuat catalog barang karena tidak hanya memerlukan design horizontal atau vertical melainkan design dengan menggabungkan keduanya sehingga gap serta tampilannya menjadi rapi.
+- Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+    - Implementasikan fungsi untuk menghapus dan mengedit product.
+        1. Menambahkan fungsi `edit_product` pada `views.py` yang ada pada folder `main` dengan kode berikut.
+            ```python
+            def edit_product(request, id):
+                product = Product.objects.get(pk = id)
+
+                form = ProductForm(request.POST or None, instance=product)
+
+                if form.is_valid() and request.method == "POST":
+                    form.save()
+                    return HttpResponseRedirect(reverse('main:show_main'))
+
+                context = {'form': form}
+                return render(request, "edit_product.html", context)
+            ```
+        2. Menambahkan path pada `urlpatterns` yang ada pada `urls.py` 
+            ```python
+            urlpatterns = [
+                ....,
+                path('edit-product/<uuid:id>', edit_product, name='edit_product'),
+            ]
+            ```
+            Note: < uuid:id > digunakan untuk passing id ke dalam fungsi `edit_product`
+        3. Menambahkan fungsi `delete_product` pada `views.py` yang ada pada folder `main` dengan kode berikut.
+            ```python
+            def delete_product(request, id):
+                product = Product.objects.get(pk = id)
+                product.delete()
+                return HttpResponseRedirect(reverse('main:show_main'))
+
+            ```
+        4. Menambahkan path pada `urlpatterns` yang ada pada `urls.py` 
+            ```python
+            urlpatterns = [
+                ....,
+                path('delete/<uuid:id>', delete_product, name='delete_product'),
+            ]
+            ```
+            Note: < uuid:id > digunakan untuk passing id ke dalam fungsi `delete_product`
+        
+    - Kustomisasi desain pada template HTML yang telah dibuat pada tugas-tugas sebelumnya menggunakan CSS atau CSS framework (seperti Bootstrap, Tailwind, Bulma) dengan ketentuan sebagai berikut:
+        - Kustomisasi halaman login, register, dan tambah product semenarik mungkin.
+        <img src="./Tugas5/LoginPage.png">
+        <img src="./Tugas5/RegisterPage.png">
+        <img src="./Tugas5/CreateProductPage.png">
+        - Kustomisasi halaman daftar product menjadi lebih menarik dan responsive. Kemudian, perhatikan kondisi berikut:
+            - Jika pada aplikasi belum ada product yang tersimpan, halaman daftar product akan menampilkan gambar dan pesan bahwa belum ada product yang terdaftar.
+            <img src="./Tugas5/NoProductMobile.png">
+            - Jika sudah ada product yang tersimpan, halaman daftar product akan menampilkan detail setiap product dengan menggunakan card (tidak boleh sama persis dengan desain pada Tutorial!).
+            <img src="./Tugas5/HomePage.png">
+            <img src="./Tugas5/HomePageMobile.png">
+        - Untuk setiap card product, buatlah dua buah button untuk mengedit dan menghapus product pada card tersebut!
+        <img src="./Tugas5/CardProduct.png">
+        - Buatlah navigation bar (navbar) untuk fitur-fitur pada aplikasi yang responsive terhadap perbedaan ukuran device, khususnya mobile dan desktop.
+        <img src="./Tugas5/NavbarMobile.png">
+        <img src="./Tugas5/NavbarDesktop.png">
+
+

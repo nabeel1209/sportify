@@ -1,0 +1,27 @@
+{% load static %}
+<div class="fixed w-full h-20 top-0 z-10 flex justify-center items-center p-3">
+    <nav class="flex justify-between px-3 items-center h-[90%] w-full rounded-full bg-[#ffffff17]">
+        <div class="flex justify-center items-center h-[90%] gap-2 font-bold text-white sm:text-lg sm:gap-3">
+            <div class="relative h-8 w-8 rounded-full bg-[#22c55ea6] cursor-pointer group text-base">
+                <div class="hidden w-16 absolute -bottom-9 right-[calc(50%-2rem)] bg-[#ffffff17] rounded-md justify-center items-center group-hover:flex transition duration-1000 ease-in-out font-normal">Profile</div>
+            </div>
+            {{ app_name }}
+        </div>
+        <div class="hidden gap-4 text-white sm:flex md:gap-6 lg:gap-9">
+            <a href="#" class="cursor-pointer hover:scale-105 transition text-center">Home</a>
+            <a href="#" class="cursor-pointer hover:scale-105 transition text-center">New Arrivals</a>
+            <a href="#" class="cursor-pointer hover:scale-105 transition text-center">Official Store</a>
+            <a href="#" class="cursor-pointer hover:scale-105 transition text-center">Sale</a>
+        </div>
+        <div class="flex items-center h-[45%] w-20 gap-6 justify-end pr-1">
+            <div class="relative h-full w-auto group text-white">
+                <img src="{% static "/icons/cart.png" %}" alt="" class="relative h-full w-auto cursor-pointer">
+                <div class="hidden w-12 absolute -bottom-[2.5rem] right-[calc(50%-1.5rem)] bg-[#ffffff17] rounded-md justify-center items-center group-hover:flex transition duration-1000 ease-in-out font-normal">Cart</div>
+            </div>
+            <div class="relative h-full w-auto group text-white">
+                <img src="{% static "/icons/wishlist.png" %}" alt="" class="h-full w-auto cursor-pointer">
+                <div class="hidden w-20 absolute -bottom-[2.5rem] right-[calc(50%-2.5rem)] bg-[#ffffff17] rounded-md justify-center items-center group-hover:flex transition duration-1000 ease-in-out font-normal">Wishlist</div>
+            </div>
+        </div>
+    </nav>
+</div>
