@@ -698,4 +698,230 @@ Responsive design sangat berpengaruh karena tidak semua pengguna dapat mengakses
         <img src="./Tugas5/NavbarMobile.png">
         <img src="./Tugas5/NavbarDesktop.png">
 
+---
+# Tugas 6: JavaScript dan AJAX
 
+- Jelaskan manfaat dari penggunaan JavaScript dalam pengembangan aplikasi web!
+JavaScript membantu *programmer web* untuk menambahkan interaksi user dengan web dimana JavaScript sebagai bahasa pemrograman tentunya menyediakan fitur untuk membuat logika yang dapat dibuat sebagai fungsi yang mengatur jalannya interaksi antara *user* dengan *web application*. Tanpa adanya JavaScript, *programmer web* akan sulit untuk membuat fitur interaksi dengan *web application* karena `HTML` dan `CSS` tidak mempunyai fitur logika pemrograman yang dapat diimplementasi ke dalam *web application* sebagai fitur interaksi.
+
+- Jelaskan fungsi dari penggunaan `await` ketika kita menggunakan fetch()! Apa yang akan terjadi jika kita tidak menggunakan `await`?
+Penggunaan dari `await` adalah agar fungsi `fetch()` dijalankan sebagai fungsi asinkronus dimana fungsi `fetch()` dijalankan tanpa menunggu adanya *response* dari *endpoint* yang kita *passing* sebagai *argument* dalam fungsi `fetch()`. Hal ini memungkinkan *programmer* untuk menjalankan beberapa proses dalam suatu waktu tanpa harus menunggu fungsi `fetch()` me-*return* data dari endpoint. Fungsi `fetch()` dengan `await` akan me-*return* sebuah *object* `Promise` yang akan berubah menjadi *object* data `JSON` saat fungsi `fetch()` menerima *response* dari *web application* (*endpoint*).
+
+- Mengapa kita perlu menggunakan decorator `csrf_exempt` pada `view` yang akan digunakan untuk AJAX `POST`?
+Untuk exclude `view` dari pengecekan `csrf token`, karena saat kita menggunakan AJAX `POST` kita tidak bisa memasukkan input `csrf token` yang otomatis ter-*generate* oleh sistem *backend* dari django karena kita melakukan fetch tidak dari sistem django. Sehingga kita perlu meng-*exclude* `view` tersebut.
+
+- Pada tutorial PBP minggu ini, pembersihan data input pengguna dilakukan di belakang (*backend*) juga. Mengapa hal tersebut tidak dilakukan di *frontend* saja?
+Untuk mencegah masuknya data yang dapat mengganggu sistem baik sistem *backend* maupun *frontend*. Karena saat kita membersihkan data input pada *backend* kitaa memastikan bahwa data input tersebut sudah tidak mengandung data yang menyebabkan gangguan pada sistem sebelum kita memasukkan data tersebut ke *database* dari *web application* yang kita miliki.
+
+- Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+    - `AJAX GET`
+        - Ubahlah kode cards data product agar dapat mendukung `AJAX GET`. Lakukan pengambilan data product menggunakan `AJAX GET`. Pastikan bahwa data yang diambil hanyalah data milik pengguna yang logged-in.
+            1. Untuk mendapatkan data dari product dalam database kita perlu untuk membuat fungsi untuk mengambil data dari url API yang kita punya. untuk mendapatkan url API kita perlu membuat fungsi pada `views.py` yang berguna untuk mereturn response dalam bentuk JSON yang berisikan data product pada database sesuai keinginan kita yaitu product yang dimiliki oleh sebueh user. Setelah itu kita perlu mendefinisikan url yang sesuai sebagai url API yang nantinya kita panggil untuk mendapatkan data dari database.
+            ```python
+            def show_json(request):
+                data = Product.objects.filter(user=request.user) # memilih data yang dimiliki oleh user
+                return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+            ```
+            2. Membuat fungsi untuk mendapatkan data dari database melalui url API yang telah kita definisikan sebelumnya. Hal ini dapat dilakukan dengan membuat fungsi berikut ini pada tag script dalam `main.html`. Kita menggunakan fungsi async agar kita tidak perlu menunggu response dari url API untuk melanjutkan program yang lain (asinkronus/non-blocking).
+                ```javascript
+                async function getProducts(){
+                    return fetch("{% url 'main:show_json' %}").then((res) => res.json());
+                }
+                ```
+            3. Untuk membuat cards yang nantinya dapat membuat data yang kita dapatkan menggunakan `AJAX GET` kita perlu mengubah yang sebelumnya kita menggunakan `card_product.html` sekarang kita memerlukan javascript untuk menghandle tampilan dari card product. Hal tersebut dapat kita buat dengan memasukkan kode yang kita miliki di dalam `card_product.html` ke dalam sebuah fungsi yaitu `refreshProduct()`
+                ```javascript
+                async function refreshProducts() {
+                    document.getElementById("product_cards").innerHTML = "";
+                    document.getElementById("product_cards").className = "";
+                    const products = await getProducts();
+                    let htmlString = "";
+                    let classNameString = "";
+                
+                    if (products.length === 0) {
+                        classNameString = "fixed flex flex-col justify-center items-center gap-2 left-1/2 bottom-1/3 -translate-x-1/2 translate-y-1/2";
+                        htmlString = `
+                            <img src="{% static "/icons/no-product.png" %}" alt="" class="h-auto w-28 ">
+                            <p class="font-bold text-white text-lg text-center">Belum ada data products pada Sportify.</p>
+                        `;
+                    }
+                    else {
+                        classNameString = "relative w-full h-full text-white grid grid-cols-[repeat(auto-fill,345px)] grid-rows-[repeat(auto-fill,160px)] gap-4 pt-2 justify-evenly items-center overflow-y-scroll pl-4"
+                        products.forEach((item) => {
+                            const name = DOMPurify.sanitize(item.fields.name);
+                            const description = DOMPurify.sanitize(item.fields.description);
+                            htmlString += `<div class="w-full h-40 bg-[#ffffff17] rounded-2xl text-white flex justify-evenly items-center cursor-pointer">
+                            <div class="w-28 h-28 bg-[#3b3d445d] rounded-2xl">
+                            </div>
+                            <div class="relative w-48 flex flex-col gap-1 group">
+                                <h1 class="text-[1.5rem] font-semibold">${name}</h1>
+                                <p class="truncate">${description}</p>
+                                <p class="font-medium">Rp ${item.fields.price}</p>
+                                <p class="product-stock">Stock : ${item.fields.stock}</p>
+                                <div class="absolute right-0 -bottom-1 flex justify-between items-center h-9">
+                                    <div class="hidden group-hover:flex gap-3">
+                                        <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer group" href="/delete/${item.pk}">
+                                            <img src="{% static "/icons/delete.png" %}" alt="" class="h-full w-auto">
+                                        </a>
+                                        <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer" href="edit/${item.pk}">
+                                            <img src="{% static "/icons/edit.png" %}" alt="" class="h-full w-auto">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        });
+                    }
+                    document.getElementById("product_cards").className = classNameString;
+                    document.getElementById("product_cards").innerHTML = htmlString;
+                }
+                ```  
+
+    - `AJAX POST`
+        - Buatlah sebuah tombol yang membuka sebuah modal dengan form untuk menambahkan product.
+            1. Membuat button pada `main.html` dengan menambahkan prop onclick yang berisikan "showModal();". Nantinya fungsi showModal() akan berisikan.
+                ```javascript
+                function showModal(){
+                    const modal = document.getElementById('crudModal'); // mengambil element html dengan id crudModal
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+                ```
+            2. Nantinya element dengan id crudModal akan berisikan modal yang ada kita tampilkan yaitu seperti dibawah ini.
+                ```html
+                    <div id="crudModal" class="hidden fixed w-full h-full justify-center items-center top-0 bg-[#ffffff17] backdrop-blur-sm pt-16">
+                        <div class=" relative h-[40rem] w-[21rem] flex-col items-center justify-center bg-[#ffffff17] py-12 px-4 m-auto font-[Inter] rounded-3xl sm:px-6 sm:w-[30rem] lg:px-8">
+                            <button id="back-button" class="absolute top-3 left-3 rounded-full p-1 bg-[#ffffff17] h-10 w-10 flex justify-center items-center text-xl font-bold text-white cursor-pointer" onclick="hideModal();"><-</button>
+                            <h1 class="text-center text-white text-2xl font-extrabold">Create Product</h1>
+                            <form method="POST" class="space-y-3 flex flex-col gap-1" id="productForm">
+                                <div class="">
+                                    <label for="name" class="font-semibold text-white">Name</label>
+                                    <input type="text" id="name" name="name" class="appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" placeholder="Enter product name" required>
+                                </div>
+                                <div class="">
+                                    <label for="price" class="font-semibold text-white">Price</label>
+                                    <input type="number" id="price" name="price" class="appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" required placeholder="Enter product price">
+                                </div>
+                                <div class="">
+                                    <label for="description" class="font-semibold text-white">Description</label>
+                                    <textarea id="description" name="description" rows="3" class="h-36 appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white 0 text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" placeholder="Enter product description" required></textarea>
+                                </div>
+                                <div class="">
+                                    <label for="stock" class="font-semibold text-white">Stock</label>
+                                    <input type="number" id="stock" name="stock" class="appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" required placeholder="Enter product stock">
+                                </div>
+                                <div class="flex justify-center items-center">
+                                    <button type="submit" class="relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-[#22c55ea6] hover:bg-[#acf0c5a6] hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#22c55ea6] mt-10">
+                                    Create Product
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                ```
+
+        - Buatlah fungsi `view` baru untuk menambahkan product baru ke dalam basis data. Buatlah path `/create-ajax/` yang mengarah ke fungsi `view` yang baru kamu buat.
+            1. Membuat fungsi pada `views.py` pada folder `main` yang berisikan.
+                ```python
+                @csrf_exempt # untuk meng-exclude fungsi di bawah dari pengecekan csrf token 
+                @require_POST # memastikan fungsi di bawah hanya dapat dipanggil jika request dengan POST method
+                def create_product_with_ajax(request):
+                    name = strip_tags(request.POST.get("name"))
+                    price = request.POST.get("price")
+                    description = strip_tags(request.POST.get("description"))
+                    stock = request.POST.get("stock")
+                    user = request.user
+                    
+                    new_product = Product(
+                        name = name, 
+                        price = price,
+                        description = description,
+                        stock = stock,
+                        user = user
+                    )
+                    new_product.save()
+                    
+                    return HttpResponse(b"CREATED", status=201)
+                ```
+            2. Mendefinisikan url pada `urls.py` dengan menambahkan block kode berikut pada `urlpatterns`
+                ```python
+                urlpatterns=[
+                    ...,
+                    path('create-ajax', create_product_with_ajax, name='create_product_with_ajax'),
+                ]
+                ```
+        - Hubungkan form yang telah kamu buat di dalam modal kamu ke path `/create-ajax/`.
+            Untuk menghubungkan form yang telah dibuat pada modal kita perlu menambahkan fungsi javascript yang digunakan untuk melakukan POST ke dalam server lalu memanggil fungsi `refreshProduct()` setelah fetch berhasil dilakukan. Nantinya kita perlu menambahkan event listener ke dalam productForm yaitu saat button submit ditekan. Hal ini dapat dilakukan dengan menambahkan fungsi dibawah ini pada tag script di file `main.html`.
+            ```javascript
+            function addProduct() {
+                fetch("{% url 'main:create_product_with_ajax' %}", {
+                method: "POST",
+                body: new FormData(document.querySelector('#productForm')),
+                })
+                .then(response => refreshProducts())
+            
+                document.getElementById("productForm").reset(); 
+                document.querySelector("#back-button").click();
+            
+                return false;
+            }
+            document.getElementById("productForm").addEventListener("submit", (e) => {
+                e.preventDefault();
+                addProduct();
+            })
+            ```
+        - Lakukan refresh pada halaman utama secara asinkronus untuk menampilkan daftar product terbaru tanpa reload halaman utama secara keseluruhan.
+            Kita dapat menambahkan kode dibawah ini untuk membuat fungsi yang berguna untuk merefresh tampilan dari halaman utama
+            ```javascript
+            async function refreshProducts() {
+                document.getElementById("product_cards").innerHTML = "";
+                document.getElementById("product_cards").className = "";
+                const products = await getProducts();
+                let htmlString = "";
+                let classNameString = "";
+            
+                if (products.length === 0) {
+                    classNameString = "fixed flex flex-col justify-center items-center gap-2 left-1/2 bottom-1/3 -translate-x-1/2 translate-y-1/2";
+                    htmlString = `
+                        <img src="{% static "/icons/no-product.png" %}" alt="" class="h-auto w-28 ">
+                        <p class="font-bold text-white text-lg text-center">Belum ada data products pada Sportify.</p>
+                    `;
+                }
+                else {
+                    classNameString = "relative w-full h-full text-white grid grid-cols-[repeat(auto-fill,345px)] grid-rows-[repeat(auto-fill,160px)] gap-4 pt-2 justify-evenly items-center overflow-y-scroll pl-4"
+                    products.forEach((item) => {
+                        const name = DOMPurify.sanitize(item.fields.name);
+                        const description = DOMPurify.sanitize(item.fields.description);
+                        htmlString += `<div class="w-full h-40 bg-[#ffffff17] rounded-2xl text-white flex justify-evenly items-center cursor-pointer">
+                        <div class="w-28 h-28 bg-[#3b3d445d] rounded-2xl">
+                        </div>
+                        <div class="relative w-48 flex flex-col gap-1 group">
+                            <h1 class="text-[1.5rem] font-semibold">${name}</h1>
+                            <p class="truncate">${description}</p>
+                            <p class="font-medium">Rp ${item.fields.price}</p>
+                            <p class="product-stock">Stock : ${item.fields.stock}</p>
+                            <div class="absolute right-0 -bottom-1 flex justify-between items-center h-9">
+                                <div class="hidden group-hover:flex gap-3">
+                                    <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer group" href="/delete/${item.pk}">
+                                        <img src="{% static "/icons/delete.png" %}" alt="" class="h-full w-auto">
+                                    </a>
+                                    <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer" href="edit/${item.pk}">
+                                        <img src="{% static "/icons/edit.png" %}" alt="" class="h-full w-auto">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                    });
+                }
+                document.getElementById("product_cards").className = classNameString;
+                document.getElementById("product_cards").innerHTML = htmlString;
+                }
+            ```
+            kita juga perlu memanggil fungsi `refreshProduct()` setelah kita melakukan submit form product dengan menambahkan
+            ```javascript
+            fetch("{% url 'main:create_product_with_ajax' %}", {
+                method: "POST",
+                body: new FormData(document.querySelector('#productForm')),
+                })
+                .then(response => refreshProducts()) // refreshProduct dipanggil setelah fetch berhasil
+            ```

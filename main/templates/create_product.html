@@ -1,21 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block meta %}
-<title>Create Mood</title>
+<title>Create Product</title>
+
 {% endblock meta %}
 
 {% block content %}
 {% comment %} {% include 'navbar.html' %} {% endcomment %}
+<style>
+  form input, form textarea, form select, input#id_price, input#id_name, input#id_stock{
+    width: 100%;
+    padding: 0.5rem;
+    {% comment %} border: 2px solid #bcbcbc; {% endcomment %}
+    border-radius: 0.75rem;
+    background-color: #ffffff17;
+    -webkit-text-fill-color: white;
+    caret-color: white;
+    max-height: 10rem;
+    text-decoration: none;
+  }
+  
+  form input:focus, form textarea:focus, form select:focus, input#id_price:focus, input#id_name:focus, input#id_stock:focus {
+    outline: none;
+    border-color: #22c55ea6;
+    box-shadow: 0 0 0 1px #22c55ea6;
+  }
+</style>
 
 <div class="relative h-[40rem] w-[21rem] flex flex-col items-center justify-center bg-[#ffffff17] py-12 px-4 m-auto font-[Inter] rounded-3xl sm:px-6 sm:w-[30rem] lg:px-8">
   <a href="{% url "main:show_main" %}" class="absolute top-3 left-3 rounded-full p-1 bg-[#ffffff17] h-10 w-10 flex justify-center items-center text-xl font-bold text-white cursor-pointer"><-</a>
   <h1 class="text-center text-white text-2xl font-extrabold">
     Create Product
   </h1>
-  <form method="POST" class="space-y-3">
+  <form method="POST" class="flex flex-col gap-2 w-full px-2">
     {% csrf_token %}
     {% for field in form %}
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col">
         <label for="{{ field.id_for_label }}" class="font-semibold text-white">
           {{ field.label }}
         </label>
@@ -37,5 +57,4 @@
     </div>
   </form>
 </div>
-
 {% endblock %}

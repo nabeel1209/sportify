@@ -3,16 +3,16 @@
     <div class="w-28 h-28 bg-[#3b3d445d] rounded-2xl">
     </div>
     <div class="relative w-48 flex flex-col gap-1 group">
-        <h1 class="text-[1.5rem] font-semibold">{{ product.name }}</h1>
-        <p class="truncate">{{ product.description }}</p>
-        <p class="font-medium">Rp {{ product.price }}</p>
-        <p class="product-stock">Stock : {{ product.stock }}</p>
+        <h1 class="text-[1.5rem] font-semibold">{{ name }}</h1>
+        <p class="truncate">{{ description }}</p>
+        <p class="font-medium">Rp {{ price }}</p>
+        <p class="product-stock">Stock : {{ stock }}</p>
         <div class="absolute right-0 -bottom-1 flex justify-between items-center h-9">
             <div class="hidden group-hover:flex gap-3">
-                <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer group" href="{% url "main:delete_product" product.pk %}">
+                <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer group" href="{% url "main:delete_product" pk %}">
                     <img src="{% static "/icons/delete.png" %}" alt="" class="h-full w-auto">
                 </a>
-                <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer" href="{% url "main:edit_product" product.pk %}">
+                <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer" href="{% url "main:edit_product" pk %}">
                     <img src="{% static "/icons/edit.png" %}" alt="" class="h-full w-auto">
                 </a>
             </div>

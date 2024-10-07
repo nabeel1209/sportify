@@ -41,23 +41,23 @@
     background: none;
 }
 
-.form-style form input, form textarea, form select, input#id_price, input#id_name, input#id_stock{
+/* .form-style form input, form textarea, form select, input#id_price, input#id_name, input#id_stock{
   width: 100%;
   padding: 0.5rem;
-  /* border: 2px solid #bcbcbc; */
+  border: 2px solid #bcbcbc;
   border-radius: 0.75rem;
   background-color: #ffffff17;
   -webkit-text-fill-color: white;
   caret-color: white;
   max-height: 10rem;
   text-decoration: none;
-}
+} */
 
-.form-style form input:focus, form textarea:focus, form select:focus, input#id_price:focus, input#id_name:focus, input#id_stock:focus {
+/* .form-style form input:focus, form textarea:focus, form select:focus, input#id_price:focus, input#id_name:focus, input#id_stock:focus {
   outline: none;
   border-color: #22c55ea6;
   box-shadow: 0 0 0 1px #22c55ea6;
-}
+} */
 
 @layer utilities {
   .text-balance {

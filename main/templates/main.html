@@ -2,6 +2,7 @@
 {% load static %}
 {% block meta %}
 {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}"> {% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
 <title>{{ app_name }}</title>
 {% endblock meta %}
 
@@ -9,28 +10,127 @@
 {% include "navbar.html" %}
 <main class="relative w-full overflow-y-scroll mt-20">
     <section class="w-full h-52 pt-2 relative flex flex-col text-white justify-center items-center gap-2">
-        <h1 class="self-center text-center font-bold text-xl">Selamat datang, {{ name }}</br>dari kelas {{ class }}</h1>
+        <h1 class="self-center text-center font-bold text-xl md:text-2xl">Selamat datang, {{ name }}</br>dari kelas {{ class }}</h1>
         <div class="flex gap-2 mt-6">
             <a href="{% url 'main:create_product' %}">
                 <button class="bg-[#22c55ea6] text-lg rounded-xl px-3 py-1 font-semibold text-white cursor-pointer flex justify-center items-center">Add New Product</button>
             </a>
+            <button class="bg-[#22c55ea6] text-lg rounded-xl px-3 py-1 font-semibold text-white cursor-pointer flex justify-center items-center" onclick="showModal();">
+                Add New Product by AJAX
+            </button>
             <a href="{% url 'main:logout' %}">
                 <button class="bg-[#ef4444b0] text-lg rounded-xl px-3 py-1 font-semibold text-white cursor-pointer flex justify-center items-center">Logout</button>
             </a>
         </div>
     </section>
-    
-    {% if not products %}
-    <div class="fixed flex flex-col justify-center items-center gap-2 left-1/2 bottom-1/3 -translate-x-1/2 translate-y-1/2">
-        <img src="{% static "/icons/no-product.png" %}" alt="" class="h-auto w-28 ">
-        <p class="font-bold text-white text-lg text-center">Belum ada data products pada Sportify.</p>
+    <section id="product_cards"></section>
+    <div id="crudModal" class="hidden fixed w-full h-full justify-center items-center top-0  backdrop-blur-sm pt-16">
+        <div class=" relative h-[40rem] w-[21rem] flex-col items-center justify-center bg-[#2c2c2c] py-12 px-4 m-auto font-[Inter] rounded-3xl sm:px-6 sm:w-[30rem] lg:px-8 transition-all">
+            <button id="back-button" class="absolute top-3 left-3 rounded-full p-1 bg-[#ffffff17] h-10 w-10 flex justify-center items-center text-xl font-bold text-white cursor-pointer" onclick="hideModal();"><-</button>
+            <h1 class="text-center text-white text-2xl font-extrabold">Create Product</h1>
+            <form method="POST" class="space-y-3 flex flex-col gap-1 px-2" id="productForm">
+                <div class="">
+                    <label for="name" class="font-semibold text-white">Name</label>
+                    <input type="text" id="name" name="name" class="appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" placeholder="Enter product name" required>
+                </div>
+                <div class="">
+                      <label for="price" class="font-semibold text-white">Price</label>
+                      <input type="number" id="price" name="price" class="appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" required placeholder="Enter product price">
+                </div>
+                <div class="">
+                      <label for="description" class="font-semibold text-white">Description</label>
+                      <textarea id="description" name="description" rows="3" class="h-36 appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white 0 text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" placeholder="Enter product description" required></textarea>
+                </div>
+                <div class="">
+                    <label for="stock" class="font-semibold text-white">Stock</label>
+                    <input type="number" id="stock" name="stock" class="appearance-none relative block w-full px-3 py-2 border border-transparent placeholder-white text-white rounded-xl focus:outline-none focus:border focus:ring-[#22c55ea6] focus:border-[#22c55ea6] bg-[#ffffff17] focus:z-10 sm:text-sm" required placeholder="Enter product stock">
+                </div>
+                <div class="flex justify-center items-center">
+                    <button type="submit" class="relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-[#22c55ea6] hover:bg-[#acf0c5a6] hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#22c55ea6] mt-10">
+                      Create Product
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    {% else %}
-    <section class="relative w-full h-full text-white grid grid-cols-[repeat(auto-fill,345px)] grid-rows-[repeat(auto-fill,160px)] gap-4 pt-2 justify-evenly items-center overflow-y-scroll pl-4">
-        {% for product in products %}
-        {% include "card_product.html" with product=product %}
-        {% endfor %}
-    </section>
-    {% endif %}
 </main>
+<script>
+    async function getProducts(){
+        return fetch("{% url 'main:show_json' %}").then((res) => res.json());
+    }
+    
+    async function refreshProducts() {
+        document.getElementById("product_cards").innerHTML = "";
+        document.getElementById("product_cards").className = "";
+        const products = await getProducts();
+        let htmlString = "";
+        let classNameString = "";
+    
+        if (products.length === 0) {
+            classNameString = "fixed flex flex-col justify-center items-center gap-2 left-1/2 bottom-1/3 -translate-x-1/2 translate-y-1/2";
+            htmlString = `
+                <img src="{% static "/icons/no-product.png" %}" alt="" class="h-auto w-28 ">
+                <p class="font-bold text-white text-lg text-center">Belum ada data products pada Sportify.</p>
+            `;
+        }
+        else {
+            classNameString = "relative w-full h-full text-white grid grid-cols-[repeat(auto-fill,345px)] grid-rows-[repeat(auto-fill,160px)] gap-4 pt-2 justify-evenly items-center overflow-y-scroll pl-4"
+            products.forEach((item) => {
+                const name = DOMPurify.sanitize(item.fields.name);
+                const description = DOMPurify.sanitize(item.fields.description);
+                htmlString += `<div class="w-full h-40 bg-[#ffffff17] rounded-2xl text-white flex justify-evenly items-center cursor-pointer">
+                <div class="w-28 h-28 bg-[#3b3d445d] rounded-2xl">
+                </div>
+                <div class="relative w-48 flex flex-col gap-1 group">
+                    <h1 class="text-[1.5rem] font-semibold">${name}</h1>
+                    <p class="truncate">${description}</p>
+                    <p class="font-medium">Rp ${item.fields.price}</p>
+                    <p class="product-stock">Stock : ${item.fields.stock}</p>
+                    <div class="absolute right-0 -bottom-1 flex justify-between items-center h-9">
+                        <div class="hidden group-hover:flex gap-3">
+                            <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer group" href="/delete/${item.pk}">
+                                <img src="{% static "/icons/delete.png" %}" alt="" class="h-full w-auto">
+                            </a>
+                            <a class="h-9 w-auto rounded-full flex justify-center items-center p-2 bg-[#ffffff17] cursor-pointer" href="edit-product/${item.pk}">
+                                <img src="{% static "/icons/edit.png" %}" alt="" class="h-full w-auto">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            });
+        }
+        document.getElementById("product_cards").className = classNameString;
+        document.getElementById("product_cards").innerHTML = htmlString;
+    }
+    refreshProducts();
+
+    function showModal(){
+        const modal = document.getElementById('crudModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    function hideModal(){
+        const modal = document.getElementById('crudModal');
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+    function addProduct() {
+        fetch("{% url 'main:create_product_with_ajax' %}", {
+          method: "POST",
+          body: new FormData(document.querySelector('#productForm')),
+        })
+        .then(response => refreshProducts())
+    
+        document.getElementById("productForm").reset(); 
+        document.querySelector("#back-button").click();
+    
+        return false;
+    }
+
+    document.getElementById("productForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        addProduct();
+    })
+</script>
 {% endblock content %}
