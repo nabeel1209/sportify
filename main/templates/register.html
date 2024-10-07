@@ -5,6 +5,25 @@
 {% endblock meta %}
 
 {% block content %}
+<style>
+  form input, form textarea, form select, input#id_price, input#id_name, input#id_stock{
+    width: 100%;
+    padding: 0.5rem;
+    {% comment %} border: 2px solid #bcbcbc; {% endcomment %}
+    border-radius: 0.75rem;
+    background-color: #ffffff17;
+    -webkit-text-fill-color: white;
+    caret-color: white;
+    max-height: 10rem;
+    text-decoration: none;
+  }
+  
+  form input:focus, form textarea:focus, form select:focus, input#id_price:focus, input#id_name:focus, input#id_stock:focus {
+    outline: none;
+    border-color: #22c55ea6;
+    box-shadow: 0 0 0 1px #22c55ea6;
+  }
+</style>
 <div class="m-auto flex flex-col gap-10">
   <div class="flex gap-5 h-28 text-white justify-center items-center text-3xl font-bold">
     <img src="{% static "/images/Sportify.png" %}" alt="" class="h-full w-auto">
